@@ -1,8 +1,6 @@
 import React from 'react'
-import {Zap
-
-} from 'lucide-react'
-import Title from './title';
+import {Zap} from 'lucide-react'
+import Title from './Title';
 
 const Features = () => {
      const [isHover, setIsHover] = React.useState(false);
