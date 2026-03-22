@@ -134,11 +134,28 @@ export const uploadresume= async (req,res) => {
             response_format:{type:"json_object"}
         })
          const extractdata =response.choices[0].message.content;
-         const parseddata = JSON.parse(extractdata)
+         console.log("Extracted Data length:", extractdata?.length);
+
+         let parseddata;
+         try {
+             // Try strict parse
+             parseddata = JSON.parse(extractdata);
+         } catch (parseError) {
+             console.log("Strict JSON parse failed. Trying robust parsing.");
+             // Try stripping markdown blocks if any
+             const jsonMatch = extractdata.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+             if (jsonMatch) {
+                 parseddata = JSON.parse(jsonMatch[1]);
+             } else {
+                 throw new Error("Failed to parse JSON: " + parseError.message);
+             }
+         }
+
          const newResume = await Resume.create({userId,title,...parseddata})
          return res.json({resumeId:newResume._id})
 
     } catch (error) {
+        console.error("Upload resume error:", error);
         return res.status(400).json({message:error.message})
     }
     
